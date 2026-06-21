@@ -1,4 +1,4 @@
-package Excepciones
+package Excepciones;
 
 public class DineroInsuficienteException extends Exception {
     public DineroInsuficienteException(String mensaje) {

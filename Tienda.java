@@ -1,5 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
+
+import Excepciones.CapacidadMaximaException;
+import Excepciones.MascotaEnfermaException;
+import Excepciones.MascotaNoEncontradaException;
 import excepciones.*;
 import mascotas.Mascota;
 
@@ -25,10 +29,13 @@ public class Tienda {
         return presupuesto;
     }
 
-    public void agregarMascota(Mascota mascota) throws CapacidadMaximaException{
-        inventario.add(mascota);
-        System.out.println("Has agragedo a un/a " + mascota.getEspecie() + " a la tienda" );
+   public void agregarMascota(Mascota mascota) throws CapacidadMaximaException{
+    if (inventario.size() >= inventariomaximo) {
+        throw new CapacidadMaximaException("La tienda alcanzó su capacidad máxima de " + inventariomaximo + " mascotas.");
     }
+    inventario.add(mascota);
+    System.out.println("Has agragedo a un/a " + mascota.getEspecie() + " a la tienda" );
+}
 
     public void venderMascota(String especieMascota) throws MascotaNoEncontradaException, MascotaEnfermaException{
         Mascota mascotaVender = null;
@@ -48,7 +55,7 @@ public class Tienda {
 
         inventario.remove(mascotaVender);
         this.presupuesto += mascotaVender.getPrecio() * 1.5;
-        System.out.println("Has vendido a un " + especieMascota + " por" + this.presupuesto " exitosamente!" );
+        System.out.println("Has vendido a un " + especieMascota + " por" + this.presupuesto + " exitosamente!" );
     }
 
     public void mostrarHudTienda() {

@@ -4,7 +4,6 @@ import java.util.List;
 import Excepciones.CapacidadMaximaException;
 import Excepciones.MascotaEnfermaException;
 import Excepciones.MascotaNoEncontradaException;
-import excepciones.*;
 import mascotas.Mascota;
 
 public class Tienda {

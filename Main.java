@@ -1,4 +1,4 @@
-import excepciones.*;
+import Excepciones.*;
 import mascotas.*;
 
 public class Main {

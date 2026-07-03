@@ -1,4 +1,8 @@
 import Excepciones.*;
+import Mascotas.Gato;
+import Mascotas.Mascota;
+import Mascotas.Perro;
+import Mascotas.Pez;
 import mascotas.*;
 
 public class Main {
@@ -31,6 +35,7 @@ public class Main {
         try {
             Mascota perroEnfermo = new Perro();
             perroEnfermo.setNivelSalud(30);
+             miTienda.venderMascota("Perro");
             miTienda.agregarMascota(perroEnfermo);
             miTienda.venderMascota("Perro");
         } catch (Exception e) {

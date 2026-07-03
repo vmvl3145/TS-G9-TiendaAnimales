@@ -21,8 +21,8 @@ public abstract class Mascota{
         return nivelSalud;
     }
 
-    public void setNivelSalud(int salud)
+    public void setNivelSalud(int salud){
         this.nivelSalud = salud;
     }
-    public abstract class void makeSound();
+    public abstract void makeSound();
 }

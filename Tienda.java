@@ -2,28 +2,26 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import Excepciones.*;
+import Mascotas.FabricaMascotas;
 import Mascotas.Mascota;
 import Suministros.Suministro;
 
 public class Tienda implements Serializable {
     private static final long serialVersionUID = 1L;
-
-    // La instancia Singleton no se serializa automáticamente al ser estática
     private static Tienda tienda;
-
     private double presupuesto;
     private List<Mascota> inventarioMascotas;
     private List<Suministro> inventarioSuministros;
     private final int inventarioMaximo = 5;
 
-    // Constructor privado para el patrón Singleton
+    // Constructor Singleton
     private Tienda() {
         this.presupuesto = 1000.0;
         this.inventarioMascotas = new ArrayList<>();
         this.inventarioSuministros = new ArrayList<>();
     }
 
-    // Método de acceso global (Singleton)
+    // Singleton
     public static Tienda getTienda() {
         if (tienda == null) {
             tienda = new Tienda();
@@ -32,11 +30,36 @@ public class Tienda implements Serializable {
     }
 
     // Getters
-    public double getPresupuesto() { return presupuesto; }
-    public List<Mascota> getInventarioMascotas() { return inventarioMascotas; }
-    public List<Suministro> getInventarioSuministros() { return inventarioSuministros; }
+    public double getPresupuesto() {
+        return presupuesto;
+    }
 
-    // LÓGICA DE NEGOCIO
+    public List<Mascota> getInventarioMascotas() {
+        return inventarioMascotas;
+    }
+
+    public List<Suministro> getInventarioSuministros() {
+        return inventarioSuministros;
+    }
+
+    // Factory Method Comercial
+    public void comprarMascota(String tipo) throws DineroInsuficienteException, CapacidadMaximaException {
+        if (inventarioMascotas.size() >= inventarioMaximo) {
+            throw new CapacidadMaximaException("No hay espacio en la tienda. Vende una mascota primero.");
+        }
+        Mascota nueva = FabricaMascotas.crearMascotaComprada(tipo, this.presupuesto);
+        this.presupuesto -= nueva.getPrecio();
+        inventarioMascotas.add(nueva);
+    }
+
+    // Factory Method Rescate
+    public void rescatarMascota(String tipo) throws CapacidadMaximaException {
+        if (inventarioMascotas.size() >= inventarioMaximo) {
+            throw new CapacidadMaximaException("No hay espacio en la tienda. Vende una mascota primero.");
+        }
+        Mascota rescatada = FabricaMascotas.crearMascotaRescatada(tipo);
+        inventarioMascotas.add(rescatada);
+    }
 
     public void agregarMascota(Mascota mascota) throws CapacidadMaximaException {
         if (inventarioMascotas.size() >= inventarioMaximo) {
@@ -79,7 +102,7 @@ public class Tienda implements Serializable {
         }
     }
 
-    // --- MOTOR DE TIEMPO (Semana 2) ---
+    // TIEMPO
     public void pasarTiempo() {
         System.out.println("\n[Pasando el tiempo en la tienda... Los animales sienten necesidades]");
         for (Mascota m : inventarioMascotas) {
@@ -95,7 +118,7 @@ public class Tienda implements Serializable {
         }
     }
 
-    // --- HUD ---
+    // HUD CONSOLA
     public void mostrarHud() {
         System.out.println("\n===== ESTADO DE LA TIENDA =====");
         System.out.println("Presupuesto: $" + presupuesto);
@@ -114,7 +137,7 @@ public class Tienda implements Serializable {
         System.out.println("================================\n");
     }
 
-    // --- PERSISTENCIA ---
+    // GUARDADO Y CARGADO DE PARTIDA
     public void guardarPartida(String ruta) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ruta))) {
             oos.writeObject(this);

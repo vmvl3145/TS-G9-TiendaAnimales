@@ -2,6 +2,7 @@ package Mascotas;
 
 import java.io.Serializable;
 import Mascotas.estados.*;
+import Excepciones.*;
 
 public abstract class Mascota implements Serializable {
     private static final long serialVersionUID = 1L;

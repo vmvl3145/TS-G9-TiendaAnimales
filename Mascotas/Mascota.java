@@ -1,11 +1,11 @@
 package mascotas;
 
-public abstract class Mascota{
+public class Mascota{
     protected String especie;
     protected double precio;
     protected int nivelSalud;
 
-    public Mascota(String especie, double precio){
+    public abstract class Mascota(String especie, double precio){
         this.especie = especie;
         this.precio = precio;
         this.nivelSalud = 100; // valor inicial todos al 100
@@ -21,7 +21,7 @@ public abstract class Mascota{
         return nivelSalud;
     }
 
-    public void setNivelSalud(int salud){
+    public void setNivelSalud(int salud
         this.nivelSalud = salud;
     }
     public abstract void makeSound();

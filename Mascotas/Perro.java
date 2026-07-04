@@ -1,4 +1,4 @@
-package mascotas;
+package Mascotas;
 
 public class Perro extends Mascota{
     public Perro(){

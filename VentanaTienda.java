@@ -379,11 +379,45 @@ public class VentanaTienda extends JFrame {
     // =========================================================
 
     private void accionComprar() {
-        // TODO: implementar compra de mascota
+        Object[] opciones = { "Perro  ($150)", "Gato   ($100)", "Pez    ($50)" };
+        Object sel = JOptionPane.showInputDialog(
+                this,
+                "<html><b>Modelo Comercial</b><br>El animal llegará <b>sano</b>.<br>"
+                        + "El precio se descuenta de tu presupuesto.</html>",
+                "Comprar Mascota",
+                JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+        if (sel == null) return;
+
+        String tipo = sel.toString().split("\\s")[0];
+        try {
+            tienda.comprarMascota(tipo);
+            log("✓ Mascota comprada: " + tipo + " (-$" + precioBase(tipo) + ")");
+        } catch (DineroInsuficienteException | CapacidadMaximaException ex) {
+            mostrarError(ex.getMessage());
+            log("✗ Error al comprar " + tipo + ": " + ex.getMessage());
+        }
+        actualizarHUD();
     }
 
     private void accionRescatar() {
-        // TODO: implementar rescate de mascota
+        Object[] opciones = { "Perro", "Gato", "Pez" };
+        Object sel = JOptionPane.showInputDialog(
+                this,
+                "<html><b>Modelo de Rescate / Refugio</b><br>"
+                        + "Adquisición <b>gratuita</b>, pero el animal llegará en <b>estado crítico</b>.<br>"
+                        + "Necesitará Medicina antes de poder ser vendido.</html>",
+                "Rescatar Mascota",
+                JOptionPane.WARNING_MESSAGE, null, opciones, opciones[0]);
+        if (sel == null) return;
+
+        try {
+            tienda.rescatarMascota(sel.toString());
+            log("♥ Mascota rescatada: " + sel + " (¡necesita cuidados urgentes!)");
+        } catch (CapacidadMaximaException ex) {
+            mostrarError(ex.getMessage());
+            log("✗ " + ex.getMessage());
+        }
+        actualizarHUD();
     }
 
     private void accionVender() {

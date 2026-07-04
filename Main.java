@@ -15,14 +15,17 @@ public class Main {
         // Mostrar el estado justo después de cargar
         miTienda.mostrarHud();
 
-        // tienda está vacía (partida nueva), compramos animales directamente
+        // tienda está vacía (partida nueva), usamos FabricaMascotas (Factory Method)
         if (miTienda.getInventarioMascotas().isEmpty()) {
             System.out.println("Llenando inventario inicial...");
             try {
-                miTienda.agregarMascota(new Perro()); // instanciación directa
-                miTienda.agregarMascota(new Gato());
+                miTienda.agregarMascota(FabricaMascotas.crearMascota("Perro", 150.0));
+                miTienda.agregarMascota(FabricaMascotas.crearMascota("Gato", 100.0));
+                miTienda.agregarMascota(FabricaMascotas.crearMascota("Pez", 50.0));
             } catch (CapacidadMaximaException e) {
                 System.err.println(e.getMessage());
+            } catch (IllegalArgumentException e) {
+                System.err.println("Error en fábrica: " + e.getMessage());
             }
         }
         //tiempo

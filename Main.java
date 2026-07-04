@@ -1,47 +1,27 @@
-import Excepciones.*;
-import Mascotas.*;
-import Suministros.*;
+import javax.swing.SwingUtilities;
 
+/**
+ * Punto de entrada de la aplicación.
+ *
+ * Responsabilidades:
+ *   1. Cargar la partida previa desde disco (persistencia, Semana 2).
+ *   2. Lanzar la interfaz gráfica en el Event Dispatch Thread (EDT),
+ *      siguiendo las buenas prácticas de concurrencia de Swing.
+ *
+ * No contiene lógica de negocio: esta clase únicamente inicializa
+ * el Modelo (Tienda) y delega la presentación a la Vista (VentanaTienda).
+ */
 public class Main {
     public static void main(String[] args) {
         final String ARCHIVO_GUARDADO = "partida_tienda.dat";
 
-        System.out.println("INICIANDO TIENDA");
-
-        // cargar la partida previa
+        // Cargar el estado previo antes de crear la UI
         Tienda.cargarPartida(ARCHIVO_GUARDADO);
-        Tienda miTienda = Tienda.getTienda();
 
-        // Mostrar el estado justo después de cargar
-        miTienda.mostrarHud();
-
-        // tienda está vacía (partida nueva), usamos Factory Method via Tienda
-        if (miTienda.getInventarioMascotas().isEmpty()) {
-            System.out.println("Llenando inventario inicial...");
-            try {
-                miTienda.comprarMascota("Perro");   // Modelo Comercial
-                miTienda.comprarMascota("Gato");
-                miTienda.rescatarMascota("Pez");    // Modelo Rescate (llega enfermo)
-            } catch (CapacidadMaximaException | DineroInsuficienteException e) {
-                System.err.println(e.getMessage());
-            }
-        }
-        //tiempo
-        miTienda.pasarTiempo();
-        miTienda.mostrarHud();
-
-        if (!miTienda.getInventarioMascotas().isEmpty()) {
-            Mascota primerAnimal = miTienda.getInventarioMascotas().get(0);
-            Suministro alimentoPremium = new Comida("Croquetas Premium", 25.0, 40);
-
-            try {
-                miTienda.agregarSuministro(alimentoPremium);
-                alimentoPremium.usar(primerAnimal); // Solo se alimenta si la compra fue exitosa
-            } catch (DineroInsuficienteException e) {
-                System.err.println("Error de compra: " + e.getMessage());
-            }
-        }
-
-        miTienda.mostrarHud();
+        // Lanzar la ventana en el Event Dispatch Thread (obligatorio en Swing)
+        SwingUtilities.invokeLater(() -> {
+            VentanaTienda ventana = new VentanaTienda(ARCHIVO_GUARDADO);
+            ventana.setVisible(true);
+        });
     }
 }

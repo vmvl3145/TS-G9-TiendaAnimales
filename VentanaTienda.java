@@ -421,15 +421,109 @@ public class VentanaTienda extends JFrame {
     }
 
     private void accionVender() {
-        // TODO: implementar venta de mascota
+        if (tienda.getInventarioMascotas().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay mascotas en el inventario.",
+                    "Inventario vacío", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Object[] opciones = tienda.getInventarioMascotas().stream()
+                .map(m -> m.getEspecie()
+                        + "  [" + m.getEstado().describir() + "]"
+                        + "  →  precio venta: $" + (m.getPrecio() * 1.5))
+                .toArray();
+        Object sel = JOptionPane.showInputDialog(
+                this,
+                "<html>Selecciona la mascota a vender<br>"
+                        + "<small>(precio venta = precio base × 1.5, solo mascotas <b>SANAS</b>)</small></html>",
+                "Vender Mascota",
+                JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+        if (sel == null) return;
+
+        String tipo = sel.toString().split("\\s")[0];
+        try {
+            tienda.venderMascota(tipo);
+            log("💰 Mascota vendida: " + tipo + " (+$" + (precioBase(tipo) * 1.5) + ")");
+        } catch (MascotaEnfermaException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(),
+                    "Venta bloqueada — Mascota enferma", JOptionPane.WARNING_MESSAGE);
+            log("✗ Venta bloqueada: " + ex.getMessage());
+        } catch (MascotaNoEncontradaException ex) {
+            mostrarError(ex.getMessage());
+        }
+        actualizarHUD();
     }
 
     private void accionComprarSuministro() {
-        // TODO: implementar compra de suministro
+        Object[] opciones = {
+                "Comida — Croquetas Basicas  ($15 | hambre -30)",
+                "Comida — Croquetas Premium  ($25 | hambre -50)",
+                "Comida — Comida Humeda      ($35 | hambre -70)",
+                "Medicina — Vitaminas           ($30 | salud +25)",
+                "Medicina — Antibiotico         ($60 | salud +50)",
+                "Medicina — Tratamiento Intensivo ($90 | salud +75)"
+        };
+        Object sel = JOptionPane.showInputDialog(
+                this, "Selecciona el suministro a comprar:",
+                "Comprar Suministro", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
+        if (sel == null) return;
+
+        Suministros.Suministro s = crearSuministro(sel.toString());
+        if (s == null) return;
+
+        try {
+            tienda.agregarSuministro(s);
+            log("🛒 Suministro comprado: " + s.getNombre() + " (-$" + s.getPrecio() + ")");
+        } catch (DineroInsuficienteException ex) {
+            mostrarError(ex.getMessage());
+            log("✗ Sin fondos: " + ex.getMessage());
+        }
+        actualizarHUD();
     }
 
     private void accionUsarSuministro() {
-        // TODO: implementar uso de suministro
+        if (tienda.getInventarioSuministros().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay suministros en stock. Compra primero.",
+                    "Sin stock", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (tienda.getInventarioMascotas().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay mascotas en el inventario.",
+                    "Sin mascotas", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        Object[] sumOpts = tienda.getInventarioSuministros().stream()
+                .map(Suministros.Suministro::getNombre).toArray();
+        Object sumSel = JOptionPane.showInputDialog(
+                this, "Paso 1 de 2 — ¿Qué suministro deseas usar?",
+                "Usar Suministro", JOptionPane.QUESTION_MESSAGE, null, sumOpts, sumOpts[0]);
+        if (sumSel == null) return;
+
+        Object[] mascOpts = tienda.getInventarioMascotas().stream()
+                .map(m -> m.getEspecie()
+                        + "  Salud:" + m.getNivelSalud()
+                        + "  Hambre:" + m.getNivelHambre()
+                        + "  [" + m.getEstado().describir() + "]")
+                .toArray();
+        Object mascSel = JOptionPane.showInputDialog(
+                this, "Paso 2 de 2 — ¿En qué mascota lo usas?",
+                "Usar Suministro", JOptionPane.QUESTION_MESSAGE, null, mascOpts, mascOpts[0]);
+        if (mascSel == null) return;
+
+        Suministros.Suministro sumObj = tienda.getInventarioSuministros().stream()
+                .filter(s -> s.getNombre().equals(sumSel.toString()))
+                .findFirst().orElse(null);
+        Mascotas.Mascota mascObj = tienda.getInventarioMascotas().stream()
+                .filter(m -> mascSel.toString().startsWith(m.getEspecie()))
+                .findFirst().orElse(null);
+
+        if (sumObj != null && mascObj != null) {
+            sumObj.usar(mascObj);
+            tienda.getInventarioSuministros().remove(sumObj);
+            log("> " + sumObj.getNombre() + " → " + mascObj.getEspecie()
+                    + " | Estado ahora: [" + mascObj.getEstado().describir() + "]"
+                    + " | Salud: " + mascObj.getNivelSalud());
+        }
+        actualizarHUD();
     }
 
     private void accionPasarTiempo() {
@@ -442,5 +536,28 @@ public class VentanaTienda extends JFrame {
 
     private void accionCargar() {
         // TODO: implementar carga de partida
+    }
+
+    // =========================================================
+    // HELPERS PRIVADOS
+    // =========================================================
+
+    private double precioBase(String tipo) {
+        switch (tipo.toLowerCase()) {
+            case "perro": return 150.0;
+            case "gato":  return 100.0;
+            case "pez":   return  50.0;
+            default:      return    0.0;
+        }
+    }
+
+    private Suministros.Suministro crearSuministro(String opcion) {
+        if (opcion.contains("Croquetas Basicas"))   return new Suministros.Comida("Croquetas Basicas", 15.0, 30);
+        if (opcion.contains("Croquetas Premium"))   return new Suministros.Comida("Croquetas Premium", 25.0, 50);
+        if (opcion.contains("Comida Humeda"))       return new Suministros.Comida("Comida Humeda",     35.0, 70);
+        if (opcion.contains("Vitaminas"))           return new Suministros.Medicina("Vitaminas",              30.0, 25);
+        if (opcion.contains("Antibiotico"))         return new Suministros.Medicina("Antibiotico",            60.0, 50);
+        if (opcion.contains("Tratamiento Intensivo")) return new Suministros.Medicina("Tratamiento Intensivo", 90.0, 75);
+        return null;
     }
 }

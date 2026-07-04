@@ -527,15 +527,30 @@ public class VentanaTienda extends JFrame {
     }
 
     private void accionPasarTiempo() {
-        // TODO: implementar avance del tiempo
+        tienda.pasarTiempo();
+        log(">> Tiempo avanzado — los animales sienten necesidades. ¡Revisa su estado!");
+        actualizarHUD();
     }
 
     private void accionGuardar() {
-        // TODO: implementar guardado de partida
+        tienda.guardarPartida(archivoGuardado);
+        log(">> Partida guardada en: " + archivoGuardado);
+        JOptionPane.showMessageDialog(this,
+                "Partida guardada correctamente en:\n" + archivoGuardado,
+                "Partida Guardada", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void accionCargar() {
-        // TODO: implementar carga de partida
+        int conf = JOptionPane.showConfirmDialog(
+                this,
+                "¿Cargar la partida guardada?\nSe perderán todos los cambios no guardados.",
+                "Cargar Partida", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (conf != JOptionPane.YES_OPTION) return;
+
+        Tienda.cargarPartida(archivoGuardado);
+        this.tienda = Tienda.getTienda();
+        log(">> Partida cargada desde: " + archivoGuardado);
+        actualizarHUD();
     }
 
     // =========================================================
@@ -552,12 +567,14 @@ public class VentanaTienda extends JFrame {
     }
 
     private Suministros.Suministro crearSuministro(String opcion) {
-        if (opcion.contains("Croquetas Basicas"))   return new Suministros.Comida("Croquetas Basicas", 15.0, 30);
-        if (opcion.contains("Croquetas Premium"))   return new Suministros.Comida("Croquetas Premium", 25.0, 50);
-        if (opcion.contains("Comida Humeda"))       return new Suministros.Comida("Comida Humeda",     35.0, 70);
-        if (opcion.contains("Vitaminas"))           return new Suministros.Medicina("Vitaminas",              30.0, 25);
-        if (opcion.contains("Antibiotico"))         return new Suministros.Medicina("Antibiotico",            60.0, 50);
-        if (opcion.contains("Tratamiento Intensivo")) return new Suministros.Medicina("Tratamiento Intensivo", 90.0, 75);
+        if (opcion.contains("Croquetas Basicas"))     return new Suministros.Comida("Croquetas Basicas", 15.0, 30);
+        if (opcion.contains("Croquetas Premium"))     return new Suministros.Comida("Croquetas Premium", 25.0, 50);
+        if (opcion.contains("Comida Humeda"))         return new Suministros.Comida("Comida Humeda",     35.0, 70);
+        if (opcion.contains("Vitaminas"))             return new Suministros.Medicina("Vitaminas",               30.0, 25);
+        if (opcion.contains("Antibiotico"))           return new Suministros.Medicina("Antibiotico",             60.0, 50);
+        if (opcion.contains("Tratamiento Intensivo")) return new Suministros.Medicina("Tratamiento Intensivo",   90.0, 75);
         return null;
     }
+
+    // TODO (Semana 4): implementar reproducirSonido() y reproducirMusicaFondo() con javax.sound.sampled
 }

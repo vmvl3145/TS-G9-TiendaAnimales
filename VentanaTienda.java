@@ -10,42 +10,32 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Vista principal de la Tienda de Mascotas — interfaz gráfica Swing (Semana 3).
- *
- * Responsabilidades:
- *   - Construir y mostrar la ventana principal de la aplicación.
- *   - Delegar todas las acciones de negocio a Tienda (Modelo).
- *   - Actualizar el HUD manualmente tras cada acción.
- *
- * Patrones aplicados: MVC (Vista), Singleton (acceso a Tienda).
- */
 public class VentanaTienda extends JFrame {
 
     // PALETA DE COLORES
-    private static final Color C_FONDO      = new Color(15, 17, 26);
-    private static final Color C_PANEL      = new Color(22, 27, 44);
-    private static final Color C_HUD_BG     = new Color(10, 12, 22);
-    private static final Color C_HUD_TEXTO  = new Color(80, 250, 123);
-    private static final Color C_LOG_BG     = new Color(12, 14, 24);
-    private static final Color C_LOG_TEXTO  = new Color(180, 190, 210);
-    private static final Color C_BORDE      = new Color(40, 50, 80);
-    private static final Color C_SUBTITULO  = new Color(120, 135, 170);
+    private static final Color C_FONDO = new Color(15, 17, 26);
+    private static final Color C_PANEL = new Color(22, 27, 44);
+    private static final Color C_HUD_BG = new Color(10, 12, 22);
+    private static final Color C_HUD_TEXTO = new Color(80, 250, 123);
+    private static final Color C_LOG_BG = new Color(12, 14, 24);
+    private static final Color C_LOG_TEXTO = new Color(180, 190, 210);
+    private static final Color C_BORDE = new Color(40, 50, 80);
+    private static final Color C_SUBTITULO = new Color(120, 135, 170);
 
-    // COLORES por categoría de botón
-    private static final Color C_BTN_COMPRA     = new Color(22, 163, 74);
-    private static final Color C_BTN_RESCATE    = new Color(234, 88, 12);
-    private static final Color C_BTN_VENTA      = new Color(79, 70, 229);
+    // COLORES BOTONES
+    private static final Color C_BTN_COMPRA = new Color(22, 163, 74);
+    private static final Color C_BTN_RESCATE = new Color(234, 88, 12);
+    private static final Color C_BTN_VENTA = new Color(79, 70, 229);
     private static final Color C_BTN_SUMINISTRO = new Color(14, 165, 233);
-    private static final Color C_BTN_TIEMPO     = new Color(147, 51, 234);
-    private static final Color C_BTN_SISTEMA    = new Color(71, 85, 105);
+    private static final Color C_BTN_TIEMPO = new Color(147, 51, 234);
+    private static final Color C_BTN_SISTEMA = new Color(71, 85, 105);
 
     // TIPOGRAFÍAS
-    private static final Font F_TITULO  = new Font("SansSerif", Font.BOLD, 20);
+    private static final Font F_TITULO = new Font("SansSerif", Font.BOLD, 20);
     private static final Font F_SECCION = new Font("SansSerif", Font.BOLD, 11);
-    private static final Font F_BOTON   = new Font("SansSerif", Font.BOLD, 12);
-    private static final Font F_HUD     = new Font("Monospaced", Font.PLAIN, 13);
-    private static final Font F_LOG     = new Font("Monospaced", Font.PLAIN, 11);
+    private static final Font F_BOTON = new Font("SansSerif", Font.BOLD, 12);
+    private static final Font F_HUD = new Font("Monospaced", Font.PLAIN, 13);
+    private static final Font F_LOG = new Font("Monospaced", Font.PLAIN, 11);
 
     // ESTADO
     private Tienda tienda;
@@ -65,10 +55,7 @@ public class VentanaTienda extends JFrame {
         actualizarHUD();
     }
 
-    // =========================================================
-    // CONSTRUCCIÓN DE LA UI
-    // =========================================================
-
+    // CONSTRUCCIÓN UI
     private void construirUI() {
         setTitle("Tienda de Mascotas");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,7 +86,7 @@ public class VentanaTienda extends JFrame {
         titulo.setFont(F_TITULO);
         titulo.setForeground(Color.WHITE);
 
-        JLabel sub = new JLabel("Semana 3 — Interfaz Gráfica Swing");
+        JLabel sub = new JLabel("testing localization");
         sub.setFont(new Font("SansSerif", Font.ITALIC, 12));
         sub.setForeground(C_SUBTITULO);
 
@@ -162,27 +149,27 @@ public class VentanaTienda extends JFrame {
         p.setBackground(C_FONDO);
         p.setPreferredSize(new Dimension(215, 0));
 
-        p.add(seccion("ADQUISICIÓN", new JButton[]{
-                boton("Comprar Mascota",   C_BTN_COMPRA,     e -> accionComprar()),
-                boton("Rescatar Mascota",  C_BTN_RESCATE,    e -> accionRescatar())
+        p.add(seccion("ADQUISICIÓN", new JButton[] {
+                boton("Comprar Mascota", C_BTN_COMPRA, e -> accionComprar()),
+                boton("Rescatar Mascota", C_BTN_RESCATE, e -> accionRescatar())
         }));
         p.add(Box.createVerticalStrut(8));
-        p.add(seccion("VENTAS", new JButton[]{
-                boton("Vender Mascota",    C_BTN_VENTA,      e -> accionVender())
+        p.add(seccion("VENTAS", new JButton[] {
+                boton("Vender Mascota", C_BTN_VENTA, e -> accionVender())
         }));
         p.add(Box.createVerticalStrut(8));
-        p.add(seccion("SUMINISTROS", new JButton[]{
+        p.add(seccion("SUMINISTROS", new JButton[] {
                 boton("Comprar Suministro", C_BTN_SUMINISTRO, e -> accionComprarSuministro()),
-                boton("Usar Suministro",    C_BTN_SUMINISTRO, e -> accionUsarSuministro())
+                boton("Usar Suministro", C_BTN_SUMINISTRO, e -> accionUsarSuministro())
         }));
         p.add(Box.createVerticalStrut(8));
-        p.add(seccion("TIEMPO", new JButton[]{
-                boton("Pasar el Tiempo",   C_BTN_TIEMPO,     e -> accionPasarTiempo())
+        p.add(seccion("TIEMPO", new JButton[] {
+                boton("Pasar el Tiempo", C_BTN_TIEMPO, e -> accionPasarTiempo())
         }));
         p.add(Box.createVerticalStrut(8));
-        p.add(seccion("SISTEMA", new JButton[]{
-                boton("Guardar Partida",   C_BTN_SISTEMA,    e -> accionGuardar()),
-                boton("Cargar Partida",    C_BTN_SISTEMA,    e -> accionCargar())
+        p.add(seccion("SISTEMA", new JButton[] {
+                boton("Guardar Partida", C_BTN_SISTEMA, e -> accionGuardar()),
+                boton("Cargar Partida", C_BTN_SISTEMA, e -> accionCargar())
         }));
         p.add(Box.createVerticalGlue());
         return p;
@@ -214,10 +201,6 @@ public class VentanaTienda extends JFrame {
         p.add(scroll, BorderLayout.CENTER);
         return p;
     }
-
-    // =========================================================
-    // HELPERS DE CONSTRUCCIÓN DE COMPONENTES
-    // =========================================================
 
     private JPanel seccion(String titulo, JButton[] botones) {
         JPanel p = new JPanel();
@@ -254,16 +237,20 @@ public class VentanaTienda extends JFrame {
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btn.addActionListener(listener);
         btn.addMouseListener(new MouseAdapter() {
-            @Override public void mouseEntered(MouseEvent e) { btn.setBackground(color.brighter()); }
-            @Override public void mouseExited(MouseEvent e)  { btn.setBackground(color); }
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                btn.setBackground(color.brighter());
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btn.setBackground(color);
+            }
         });
         return btn;
     }
 
-    // =========================================================
-    // HUD — Renderizado del estado de la tienda
-    // =========================================================
-
+    // HUD
     public void actualizarHUD() {
         StringBuilder sb = new StringBuilder();
         sb.append("SIMULADOR DE TIENDA DE MASCOTAS\n");
@@ -296,10 +283,7 @@ public class VentanaTienda extends JFrame {
         mascotasPanel.repaint();
     }
 
-    // =========================================================
-    // TARJETAS DE MASCOTAS
-    // =========================================================
-
+    // TARJETAS MASCOTAS
     private JPanel construirTarjetaMascota(Mascota m) {
         JPanel tarjeta = new JPanel(new BorderLayout(10, 0));
         tarjeta.setBackground(C_HUD_BG);
@@ -314,12 +298,12 @@ public class VentanaTienda extends JFrame {
         imagen.setHorizontalAlignment(SwingConstants.CENTER);
         tarjeta.add(imagen, BorderLayout.WEST);
 
-        boolean sano = m.getEstado().describir().equals("Sano");
+        boolean sano = m.getEstadoMascota().toString().equals("Sano");
         String estadoTag = sano ? "✓ SANO" : "✗ ENFERMO";
         JTextArea detalle = new JTextArea(
                 String.format("%-5s  [%s]  Precio: $%-8.1f\n", m.getEspecie(), estadoTag, m.getPrecio())
-              + String.format("Salud: %3d%%   %s\n", m.getNivelSalud(), barra(m.getNivelSalud()))
-              + String.format("Hambre: %3d%%  Higiene: %3d%%", m.getNivelHambre(), m.getNivelHigiene()));
+                        + String.format("Salud: %3d%%   %s\n", m.getNivelSalud(), barra(m.getNivelSalud()))
+                        + String.format("Hambre: %3d%%  Higiene: %3d%%", m.getNivelHambre(), m.getNivelHigiene()));
         detalle.setEditable(false);
         detalle.setFocusable(false);
         detalle.setFont(F_HUD);
@@ -330,7 +314,8 @@ public class VentanaTienda extends JFrame {
     }
 
     private ImageIcon cargarIcono(String especie) {
-        if (cacheIconos.containsKey(especie)) return cacheIconos.get(especie);
+        if (cacheIconos.containsKey(especie))
+            return cacheIconos.get(especie);
         ImageIcon icono;
         File archivo = new File("imagenes/" + especie.toLowerCase() + ".png");
         if (archivo.exists()) {
@@ -361,10 +346,7 @@ public class VentanaTienda extends JFrame {
         return "[" + "█".repeat(llenos) + "░".repeat(10 - llenos) + "]";
     }
 
-    // =========================================================
-    // HELPERS DE LOG Y ERRORES
-    // =========================================================
-
+    // LOG Y ERRORES
     private void log(String mensaje) {
         logArea.append("> " + mensaje + "\n");
         logArea.setCaretPosition(logArea.getDocument().getLength());
@@ -374,10 +356,7 @@ public class VentanaTienda extends JFrame {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
-    // =========================================================
-    // ACCIONES DE BOTONES (stub — se implementarán en próximos commits)
-    // =========================================================
-
+    // BOTONES
     private void accionComprar() {
         Object[] opciones = { "Perro  ($150)", "Gato   ($100)", "Pez    ($50)" };
         Object sel = JOptionPane.showInputDialog(
@@ -386,7 +365,8 @@ public class VentanaTienda extends JFrame {
                         + "El precio se descuenta de tu presupuesto.</html>",
                 "Comprar Mascota",
                 JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
-        if (sel == null) return;
+        if (sel == null)
+            return;
 
         String tipo = sel.toString().split("\\s")[0];
         try {
@@ -408,7 +388,8 @@ public class VentanaTienda extends JFrame {
                         + "Necesitará Medicina antes de poder ser vendido.</html>",
                 "Rescatar Mascota",
                 JOptionPane.WARNING_MESSAGE, null, opciones, opciones[0]);
-        if (sel == null) return;
+        if (sel == null)
+            return;
 
         try {
             tienda.rescatarMascota(sel.toString());
@@ -428,7 +409,7 @@ public class VentanaTienda extends JFrame {
         }
         Object[] opciones = tienda.getInventarioMascotas().stream()
                 .map(m -> m.getEspecie()
-                        + "  [" + m.getEstado().describir() + "]"
+                        + "  [" + m.getEstadoMascota().toString() + "]"
                         + "  →  precio venta: $" + (m.getPrecio() * 1.5))
                 .toArray();
         Object sel = JOptionPane.showInputDialog(
@@ -437,16 +418,17 @@ public class VentanaTienda extends JFrame {
                         + "<small>(precio venta = precio base × 1.5, solo mascotas <b>SANAS</b>)</small></html>",
                 "Vender Mascota",
                 JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
-        if (sel == null) return;
+        if (sel == null)
+            return;
 
         String tipo = sel.toString().split("\\s")[0];
         try {
             tienda.venderMascota(tipo);
-            log("💰 Mascota vendida: " + tipo + " (+$" + (precioBase(tipo) * 1.5) + ")");
+            log("Mascota vendida: " + tipo + " (+$" + (precioBase(tipo) * 1.5) + ")");
         } catch (MascotaEnfermaException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(),
                     "Venta bloqueada — Mascota enferma", JOptionPane.WARNING_MESSAGE);
-            log("✗ Venta bloqueada: " + ex.getMessage());
+            log("Venta bloqueada: " + ex.getMessage());
         } catch (MascotaNoEncontradaException ex) {
             mostrarError(ex.getMessage());
         }
@@ -455,20 +437,22 @@ public class VentanaTienda extends JFrame {
 
     private void accionComprarSuministro() {
         Object[] opciones = {
-                "Comida — Croquetas Basicas  ($15 | hambre -30)",
-                "Comida — Croquetas Premium  ($25 | hambre -50)",
-                "Comida — Comida Humeda      ($35 | hambre -70)",
-                "Medicina — Vitaminas           ($30 | salud +25)",
-                "Medicina — Antibiotico         ($60 | salud +50)",
+                "Comida — Croquetas Basicas ($15 | hambre -30)",
+                "Comida — Croquetas Premium ($25 | hambre -50)",
+                "Comida — Comida EXTRA PROTEICA ($35 | hambre -70)",
+                "Medicina — Vitaminas ($30 | salud +25)",
+                "Medicina — Antibioticos ($60 | salud +50)",
                 "Medicina — Tratamiento Intensivo ($90 | salud +75)"
         };
         Object sel = JOptionPane.showInputDialog(
                 this, "Selecciona el suministro a comprar:",
                 "Comprar Suministro", JOptionPane.QUESTION_MESSAGE, null, opciones, opciones[0]);
-        if (sel == null) return;
+        if (sel == null)
+            return;
 
         Suministros.Suministro s = crearSuministro(sel.toString());
-        if (s == null) return;
+        if (s == null)
+            return;
 
         try {
             tienda.agregarSuministro(s);
@@ -496,18 +480,20 @@ public class VentanaTienda extends JFrame {
         Object sumSel = JOptionPane.showInputDialog(
                 this, "Paso 1 de 2 — ¿Qué suministro deseas usar?",
                 "Usar Suministro", JOptionPane.QUESTION_MESSAGE, null, sumOpts, sumOpts[0]);
-        if (sumSel == null) return;
+        if (sumSel == null)
+            return;
 
         Object[] mascOpts = tienda.getInventarioMascotas().stream()
                 .map(m -> m.getEspecie()
                         + "  Salud:" + m.getNivelSalud()
                         + "  Hambre:" + m.getNivelHambre()
-                        + "  [" + m.getEstado().describir() + "]")
+                        + "  [" + m.getEstadoMascota().toString() + "]")
                 .toArray();
         Object mascSel = JOptionPane.showInputDialog(
                 this, "Paso 2 de 2 — ¿En qué mascota lo usas?",
                 "Usar Suministro", JOptionPane.QUESTION_MESSAGE, null, mascOpts, mascOpts[0]);
-        if (mascSel == null) return;
+        if (mascSel == null)
+            return;
 
         Suministros.Suministro sumObj = tienda.getInventarioSuministros().stream()
                 .filter(s -> s.getNombre().equals(sumSel.toString()))
@@ -520,7 +506,7 @@ public class VentanaTienda extends JFrame {
             sumObj.usar(mascObj);
             tienda.getInventarioSuministros().remove(sumObj);
             log("> " + sumObj.getNombre() + " → " + mascObj.getEspecie()
-                    + " | Estado ahora: [" + mascObj.getEstado().describir() + "]"
+                    + " | Estado ahora: [" + mascObj.getEstadoMascota().toString() + "]"
                     + " | Salud: " + mascObj.getNivelSalud());
         }
         actualizarHUD();
@@ -545,7 +531,8 @@ public class VentanaTienda extends JFrame {
                 this,
                 "¿Cargar la partida guardada?\nSe perderán todos los cambios no guardados.",
                 "Cargar Partida", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (conf != JOptionPane.YES_OPTION) return;
+        if (conf != JOptionPane.YES_OPTION)
+            return;
 
         Tienda.cargarPartida(archivoGuardado);
         this.tienda = Tienda.getTienda();
@@ -553,28 +540,32 @@ public class VentanaTienda extends JFrame {
         actualizarHUD();
     }
 
-    // =========================================================
-    // HELPERS PRIVADOS
-    // =========================================================
-
     private double precioBase(String tipo) {
         switch (tipo.toLowerCase()) {
-            case "perro": return 150.0;
-            case "gato":  return 100.0;
-            case "pez":   return  50.0;
-            default:      return    0.0;
+            case "perro":
+                return 150.0;
+            case "gato":
+                return 100.0;
+            case "pez":
+                return 50.0;
+            default:
+                return 0.0;
         }
     }
 
     private Suministros.Suministro crearSuministro(String opcion) {
-        if (opcion.contains("Croquetas Basicas"))     return new Suministros.Comida("Croquetas Basicas", 15.0, 30);
-        if (opcion.contains("Croquetas Premium"))     return new Suministros.Comida("Croquetas Premium", 25.0, 50);
-        if (opcion.contains("Comida Humeda"))         return new Suministros.Comida("Comida Humeda",     35.0, 70);
-        if (opcion.contains("Vitaminas"))             return new Suministros.Medicina("Vitaminas",               30.0, 25);
-        if (opcion.contains("Antibiotico"))           return new Suministros.Medicina("Antibiotico",             60.0, 50);
-        if (opcion.contains("Tratamiento Intensivo")) return new Suministros.Medicina("Tratamiento Intensivo",   90.0, 75);
+        if (opcion.contains("Croquetas Basicas"))
+            return new Suministros.Comida("Croquetas Basicas", 15.0, 30);
+        if (opcion.contains("Croquetas Premium"))
+            return new Suministros.Comida("Croquetas Premium", 25.0, 50);
+        if (opcion.contains("Comida EXTRA PROTEICA"))
+            return new Suministros.Comida("Comida EXTRA PROTEICA", 35.0, 70);
+        if (opcion.contains("Vitaminas"))
+            return new Suministros.Medicina("Vitaminas", 30.0, 25);
+        if (opcion.contains("Antibiotico"))
+            return new Suministros.Medicina("Antibioticos", 60.0, 50);
+        if (opcion.contains("Tratamiento Intensivo"))
+            return new Suministros.Medicina("Tratamiento Intensivo", 90.0, 75);
         return null;
     }
-
-    // TODO (Semana 4): implementar reproducirSonido() y reproducirMusicaFondo() con javax.sound.sampled
 }

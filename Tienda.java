@@ -1,7 +1,9 @@
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import excepciones.*;
 import mascotas.Mascota;
+import suministros.Suministro;
 
 public class Tienda {
     private static Tienda tienda;

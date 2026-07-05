@@ -149,6 +149,12 @@ public class Tienda implements Serializable {
         notificarObservadores();
     }
 
+    public void usarSuministroEnMascota(Suministro sum, Mascota masc) {
+        sum.usar(masc);
+        this.inventarioSuministros.remove(sum);
+        notificarObservadores();
+    }
+
     // HUD CONSOLA
     public void mostrarHud() {
         System.out.println("\n===== ESTADO DE LA TIENDA =====");

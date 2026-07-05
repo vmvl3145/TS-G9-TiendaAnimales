@@ -13,12 +13,14 @@ public class Tienda implements Serializable {
     private List<Mascota> inventarioMascotas;
     private List<Suministro> inventarioSuministros;
     private final int inventarioMaximo = 5;
+    private transient List<ObservadorTienda> observadores;
 
     // Constructor Singleton
     private Tienda() {
         this.presupuesto = 1000.0;
         this.inventarioMascotas = new ArrayList<>();
         this.inventarioSuministros = new ArrayList<>();
+        this.observadores = new ArrayList<>();
     }
 
     // Singleton
@@ -42,6 +44,23 @@ public class Tienda implements Serializable {
         return inventarioSuministros;
     }
 
+    // Observadores
+    public void agregarObservador(ObservadorTienda obs) {
+        if (observadores == null) observadores = new ArrayList<>();
+        if (!observadores.contains(obs)) observadores.add(obs);
+    }
+
+    public void eliminarObservador(ObservadorTienda obs) {
+        if (observadores != null) observadores.remove(obs);
+    }
+
+    private void notificarObservadores() {
+        if (observadores == null) return;
+        for (ObservadorTienda obs : observadores) {
+            obs.actualizar();
+        }
+    }
+
     // Factory Method Comercial
     public void comprarMascota(String tipo) throws DineroInsuficienteException, CapacidadMaximaException {
         if (inventarioMascotas.size() >= inventarioMaximo) {
@@ -50,6 +69,8 @@ public class Tienda implements Serializable {
         Mascota nueva = FabricaMascotas.crearMascotaComprada(tipo, this.presupuesto);
         this.presupuesto -= nueva.getPrecio();
         inventarioMascotas.add(nueva);
+
+        notificarObservadores();
     }
 
     // Factory Method Rescate
@@ -59,6 +80,8 @@ public class Tienda implements Serializable {
         }
         Mascota rescatada = FabricaMascotas.crearMascotaRescatada(tipo);
         inventarioMascotas.add(rescatada);
+
+        notificarObservadores();
     }
 
     public void agregarMascota(Mascota mascota) throws CapacidadMaximaException {
@@ -66,6 +89,8 @@ public class Tienda implements Serializable {
             throw new CapacidadMaximaException("No hay espacio en la tienda para un/a " + mascota.getEspecie());
         }
         inventarioMascotas.add(mascota);
+
+        notificarObservadores();
     }
 
     public void venderMascota(String especieMascota) throws MascotaNoEncontradaException, MascotaEnfermaException {
@@ -88,6 +113,8 @@ public class Tienda implements Serializable {
         double precioVenta = mascotaVender.getPrecio() * 1.5;
         this.presupuesto += precioVenta;
         System.out.println(">> Venta exitosa. +$" + precioVenta);
+
+        notificarObservadores();
     }
 
     public void agregarSuministro(Suministro suministro) throws DineroInsuficienteException {
@@ -100,6 +127,8 @@ public class Tienda implements Serializable {
                     this.presupuesto + " pero " + suministro.getNombre() +
                     " cuesta $" + suministro.getPrecio());
         }
+
+        notificarObservadores();
     }
 
     // TIEMPO
@@ -116,6 +145,8 @@ public class Tienda implements Serializable {
                 m.setNivelSalud(m.getNivelSalud() - 10);
             }
         }
+
+        notificarObservadores();
     }
 
     // HUD CONSOLA

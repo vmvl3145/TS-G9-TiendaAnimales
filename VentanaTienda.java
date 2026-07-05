@@ -10,7 +10,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class VentanaTienda extends JFrame {
+public class VentanaTienda extends JFrame implements ObservadorTienda {
 
     // PALETA DE COLORES
     private static final Color C_FONDO = new Color(15, 17, 26);
@@ -53,6 +53,7 @@ public class VentanaTienda extends JFrame {
         this.archivoGuardado = archivoGuardado;
         construirUI();
         actualizarHUD();
+        this.tienda.agregarObservador(this);
     }
 
     // CONSTRUCCIÓN UI
@@ -376,7 +377,6 @@ public class VentanaTienda extends JFrame {
             mostrarError(ex.getMessage());
             log("✗ Error al comprar " + tipo + ": " + ex.getMessage());
         }
-        actualizarHUD();
     }
 
     private void accionRescatar() {
@@ -398,7 +398,6 @@ public class VentanaTienda extends JFrame {
             mostrarError(ex.getMessage());
             log("✗ " + ex.getMessage());
         }
-        actualizarHUD();
     }
 
     private void accionVender() {
@@ -432,7 +431,6 @@ public class VentanaTienda extends JFrame {
         } catch (MascotaNoEncontradaException ex) {
             mostrarError(ex.getMessage());
         }
-        actualizarHUD();
     }
 
     private void accionComprarSuministro() {
@@ -461,7 +459,6 @@ public class VentanaTienda extends JFrame {
             mostrarError(ex.getMessage());
             log("✗ Sin fondos: " + ex.getMessage());
         }
-        actualizarHUD();
     }
 
     private void accionUsarSuministro() {
@@ -503,19 +500,16 @@ public class VentanaTienda extends JFrame {
                 .findFirst().orElse(null);
 
         if (sumObj != null && mascObj != null) {
-            sumObj.usar(mascObj);
-            tienda.getInventarioSuministros().remove(sumObj);
+            tienda.usarSuministroEnMascota(sumObj,mascObj);
             log("> " + sumObj.getNombre() + " → " + mascObj.getEspecie()
                     + " | Estado ahora: [" + mascObj.getEstadoMascota().toString() + "]"
                     + " | Salud: " + mascObj.getNivelSalud());
         }
-        actualizarHUD();
     }
 
     private void accionPasarTiempo() {
         tienda.pasarTiempo();
         log(">> Tiempo avanzado — los animales sienten necesidades. ¡Revisa su estado!");
-        actualizarHUD();
     }
 
     private void accionGuardar() {
@@ -537,6 +531,7 @@ public class VentanaTienda extends JFrame {
         Tienda.cargarPartida(archivoGuardado);
         this.tienda = Tienda.getTienda();
         log(">> Partida cargada desde: " + archivoGuardado);
+        this.tienda.agregarObservador(this);
         actualizarHUD();
     }
 
@@ -567,5 +562,10 @@ public class VentanaTienda extends JFrame {
         if (opcion.contains("Tratamiento Intensivo"))
             return new Suministros.Medicina("Tratamiento Intensivo", 90.0, 75);
         return null;
+    }
+
+    @Override
+    public void actualizar() {
+        actualizarHUD();
     }
 }

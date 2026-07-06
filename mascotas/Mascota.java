@@ -7,13 +7,13 @@ import mascotas.estados.EstadoSano;
 import mascotas.estados.EstadoEnfermo;
 
 /**
- * Contexto del patrón State (GoF).
+ * Contexto del patr├│n State (GoF).
  * Delega el comportamiento variable (ej: si puede venderse) al objeto
  * EstadoMascota que tenga asignado en cada momento.
  *
- * Regla de transición automática (disparada por setNivelSalud):
- *   nivelSalud >= 50  →  EstadoSano
- *   nivelSalud <  50  →  EstadoEnfermo
+ * Regla de transici├│n autom├ítica (disparada por setNivelSalud):
+ *   nivelSalud >= 50  ΓåÆ  EstadoSano
+ *   nivelSalud <  50  ΓåÆ  EstadoEnfermo
  */
 public abstract class Mascota implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -24,7 +24,7 @@ public abstract class Mascota implements Serializable {
     protected int nivelHambre;
     protected int nivelHigiene;
 
-    // --- Patrón State: estado actual de la mascota ---
+    // --- Patr├│n State: estado actual de la mascota ---
     private EstadoMascota estado;
 
     // Constructor base: toda mascota nace sana
@@ -48,14 +48,14 @@ public abstract class Mascota implements Serializable {
     // ----- Setters defensivos -----
 
     /**
-     * Setter de salud con lógica de transición de estado integrada.
-     * Actúa como el trigger del patrón State: cualquier cambio de salud
-     * que cruce el umbral de 50 dispara el cambio de estado automáticamente.
+     * Setter de salud con l├│gica de transici├│n de estado integrada.
+     * Act├║a como el trigger del patr├│n State: cualquier cambio de salud
+     * que cruce el umbral de 50 dispara el cambio de estado autom├íticamente.
      */
     public void setNivelSalud(int salud) {
         this.nivelSalud = Math.max(0, Math.min(100, salud));
 
-        // Transición de estado automática según umbral de salud
+        // Transici├│n de estado autom├ítica seg├║n umbral de salud
         if (this.nivelSalud < 50) {
             this.estado = new EstadoEnfermo();
         } else {
@@ -73,11 +73,11 @@ public abstract class Mascota implements Serializable {
 
     /**
      * Permite inyectar un estado directamente (usado por FabricaMascotas en Paso 2).
-     * Útil para crear mascotas rescatadas que nacen en EstadoEnfermo.
+     * ├Ütil para crear mascotas rescatadas que nacen en EstadoEnfermo.
      */
     public void setEstado(EstadoMascota estado) {
         this.estado = estado;
     }
 
     public abstract void makeSound();
-}
+}

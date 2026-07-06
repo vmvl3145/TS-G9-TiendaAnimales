@@ -1,6 +1,5 @@
-package suministros;
-
-import mascotas.Mascota;
+package Suministros;
+import Mascotas.Mascota;
 import java.io.Serializable;
 
 public abstract class Suministro implements Serializable {
@@ -13,13 +12,8 @@ public abstract class Suministro implements Serializable {
         this.precio = precio;
     }
 
-    public String getNombre() {
-        return nombre;
-    }
-
-    public double getPrecio() {
-        return precio;
-    }
+    public String getNombre() { return nombre; }
+    public double getPrecio() { return precio; }
 
     public abstract void usar(Mascota mascota);
 }

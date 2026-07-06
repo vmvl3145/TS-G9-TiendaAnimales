@@ -1,6 +1,5 @@
-package suministros;
-
-import mascotas.Mascota;
+package Suministros;
+import Mascotas.Mascota;
 
 public class Comida extends Suministro {
     private static final long serialVersionUID = 1L;
@@ -14,6 +13,7 @@ public class Comida extends Suministro {
     @Override
     public void usar(Mascota mascota) {
         System.out.println("Alimentando al " + mascota.getEspecie() + " con " + this.nombre + ".");
+        // Restamos hambre porque acaba de comer
         mascota.setNivelHambre(mascota.getNivelHambre() - this.valorNutricional);
     }
 }

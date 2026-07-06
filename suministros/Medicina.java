@@ -1,5 +1,5 @@
-package Suministros;
-import Mascotas.Mascota;
+package suministros;
+import mascotas.Mascota;
 
 public class Medicina extends Suministro {
     private static final long serialVersionUID = 1L;

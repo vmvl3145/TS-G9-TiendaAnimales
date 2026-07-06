@@ -1,5 +1,5 @@
-package Suministros;
-import Mascotas.Mascota;
+package suministros;
+import mascotas.Mascota;
 import java.io.Serializable;
 
 public abstract class Suministro implements Serializable {

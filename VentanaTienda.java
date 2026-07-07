@@ -11,10 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
-//musica
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.Clip;
+import javax.swing.event.ChangeEvent;
 
 public class VentanaTienda extends JFrame implements ObservadorTienda {
 
@@ -46,9 +43,6 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     private Tienda tienda;
     private final String archivoGuardado;
 
-    // MUSICA DE FONDO
-    private Clip musicaFondo;
-
     // Componentes de UI reutilizables
     private JTextArea hudArea;
     private JTextArea logArea;
@@ -63,8 +57,8 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         // Observer
         this.tienda.agregarObservador(this);
         actualizarHUD();
-        //musica
-        reproducirMusicaFondo();
+        // Audio: musica de fondo via ControlAudio
+        ControlAudio.reproducirFondo("sonidos/fondo.wav");
     }
 
     // CONSTRUCCIЩN DE LA UI
@@ -99,7 +93,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         titulo.setFont(F_TITULO);
         titulo.setForeground(Color.WHITE);
 
-        JLabel sub = new JLabel("TESTING S3");
+        JLabel sub = new JLabel("testeando fuentes");
         sub.setFont(new Font("SansSerif", Font.ITALIC, 12));
         sub.setForeground(C_SUBTITULO);
 
@@ -108,6 +102,46 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         textos.add(titulo);
         textos.add(sub);
         p.add(textos, BorderLayout.WEST);
+
+        // Panel de volumen
+        JPanel panelVolumen = new JPanel(new BorderLayout(6, 0));
+        panelVolumen.setBackground(C_PANEL);
+
+        JLabel iconoVol = new JLabel("Vol:");
+        iconoVol.setFont(new Font("SansSerif", Font.BOLD, 11));
+        iconoVol.setForeground(C_SUBTITULO);
+
+        JSlider sliderVolumen = new JSlider(JSlider.HORIZONTAL, 0, 100,
+                (int) (ControlAudio.getVolumen() * 100));
+        sliderVolumen.setPreferredSize(new Dimension(140, 26));
+        sliderVolumen.setBackground(C_PANEL);
+        sliderVolumen.setFocusable(false);
+        sliderVolumen.setToolTipText("Ajustar volumen de la musica");
+
+        JLabel lblPct = new JLabel((int) (ControlAudio.getVolumen() * 100) + "%");
+        lblPct.setFont(new Font("Monospaced", Font.PLAIN, 11));
+        lblPct.setForeground(C_SUBTITULO);
+        lblPct.setPreferredSize(new Dimension(35, 20));
+
+        sliderVolumen.addChangeListener((ChangeEvent e) -> {
+            float vol = sliderVolumen.getValue() / 100f;
+            ControlAudio.setVolumen(vol);
+            lblPct.setText(sliderVolumen.getValue() + "%");
+        });
+
+        panelVolumen.add(iconoVol, BorderLayout.WEST);
+        panelVolumen.add(sliderVolumen, BorderLayout.CENTER);
+        panelVolumen.add(lblPct, BorderLayout.EAST);
+
+        JPanel derechaHeader = new JPanel(new BorderLayout(0, 3));
+        derechaHeader.setBackground(C_PANEL);
+        JLabel lblVolTitulo = new JLabel("Volumen musica");
+        lblVolTitulo.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        lblVolTitulo.setForeground(C_SUBTITULO);
+        derechaHeader.add(lblVolTitulo, BorderLayout.NORTH);
+        derechaHeader.add(panelVolumen, BorderLayout.CENTER);
+
+        p.add(derechaHeader, BorderLayout.EAST);
 
         return p;
     }
@@ -140,25 +174,25 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         hudArea.setBorder(BorderFactory.createEmptyBorder(12, 14, 12, 14));
         hudArea.setLineWrap(false);
 
-hudArea.setBorder(BorderFactory.createEmptyBorder(12, 14, 6, 14)); // antes tenía 12 abajo, ahora 6
+        hudArea.setBorder(BorderFactory.createEmptyBorder(12, 14, 6, 14)); // antes tenía 12 abajo, ahora 6
 
-mascotasPanel = new JPanel();
-mascotasPanel.setLayout(new BoxLayout(mascotasPanel, BoxLayout.Y_AXIS));
-mascotasPanel.setBackground(C_HUD_BG);
-mascotasPanel.setBorder(BorderFactory.createEmptyBorder(0, 14, 12, 14));
+        mascotasPanel = new JPanel();
+        mascotasPanel.setLayout(new BoxLayout(mascotasPanel, BoxLayout.Y_AXIS));
+        mascotasPanel.setBackground(C_HUD_BG);
+        mascotasPanel.setBorder(BorderFactory.createEmptyBorder(0, 14, 12, 14));
 
-JPanel contenedor = new JPanel(new BorderLayout());
-contenedor.setBackground(C_HUD_BG);
-contenedor.add(hudArea, BorderLayout.NORTH);
-contenedor.add(mascotasPanel, BorderLayout.CENTER);
+        JPanel contenedor = new JPanel(new BorderLayout());
+        contenedor.setBackground(C_HUD_BG);
+        contenedor.add(hudArea, BorderLayout.NORTH);
+        contenedor.add(mascotasPanel, BorderLayout.CENTER);
 
-JScrollPane scroll = new JScrollPane(contenedor);
-scroll.setBorder(new LineBorder(C_BORDE, 1));
-scroll.getViewport().setBackground(C_HUD_BG);
-scroll.getVerticalScrollBar().setUnitIncrement(16);
+        JScrollPane scroll = new JScrollPane(contenedor);
+        scroll.setBorder(new LineBorder(C_BORDE, 1));
+        scroll.getViewport().setBackground(C_HUD_BG);
+        scroll.getVerticalScrollBar().setUnitIncrement(16);
 
-p.add(scroll, BorderLayout.CENTER);
-return p;
+        p.add(scroll, BorderLayout.CENTER);
+        return p;
     }
 
     // Panel lateral de botones
@@ -280,96 +314,94 @@ return p;
     }
 
     // HUD — Renderizado del estado
-public void actualizarHUD() {
-    StringBuilder sb = new StringBuilder();
-    sb.append("SIMULADOR DE TIENDA DE MASCOTAS\n");
-    sb.append(String.format("Presupuesto disponible : $%-17.2f\n", tienda.getPresupuesto()));
-    sb.append(String.format("Inventario mascotas    : %d / 5\n", tienda.getInventarioMascotas().size()));
-    sb.append(String.format("Suministros en stock   : %-18d\n", tienda.getInventarioSuministros().size()));
+    public void actualizarHUD() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("SIMULADOR DE TIENDA DE MASCOTAS\n");
+        sb.append(String.format("Presupuesto disponible : $%-17.2f\n", tienda.getPresupuesto()));
+        sb.append(String.format("Inventario mascotas    : %d / 5\n", tienda.getInventarioMascotas().size()));
+        sb.append(String.format("Suministros en stock   : %-18d\n", tienda.getInventarioSuministros().size()));
 
-    if (!tienda.getInventarioSuministros().isEmpty()) {
-        sb.append("\nSUMINISTROS DISPONIBLES\n");
-        for (Suministro s : tienda.getInventarioSuministros()) {
-            sb.append(String.format("  • %-28s $%-7.2f\n", s.getNombre(), s.getPrecio()));
+        if (!tienda.getInventarioSuministros().isEmpty()) {
+            sb.append("\nSUMINISTROS DISPONIBLES\n");
+            for (Suministro s : tienda.getInventarioSuministros()) {
+                sb.append(String.format("  • %-28s $%-7.2f\n", s.getNombre(), s.getPrecio()));
+            }
         }
-    }
-    hudArea.setText(sb.toString());
-    hudArea.setCaretPosition(0);
+        hudArea.setText(sb.toString());
+        hudArea.setCaretPosition(0);
 
-    mascotasPanel.removeAll();
-    if (tienda.getInventarioMascotas().isEmpty()) {
-        JLabel vacio = new JLabel("  (no hay mascotas en inventario)");
-        vacio.setForeground(C_HUD_TEXTO);
-        vacio.setFont(F_HUD);
-        mascotasPanel.add(vacio);
-    } else {
-        for (Mascota m : tienda.getInventarioMascotas()) {
-            mascotasPanel.add(construirTarjetaMascota(m));
-            mascotasPanel.add(Box.createVerticalStrut(6));
+        mascotasPanel.removeAll();
+        if (tienda.getInventarioMascotas().isEmpty()) {
+            JLabel vacio = new JLabel("  (no hay mascotas en inventario)");
+            vacio.setForeground(C_HUD_TEXTO);
+            vacio.setFont(F_HUD);
+            mascotasPanel.add(vacio);
+        } else {
+            for (Mascota m : tienda.getInventarioMascotas()) {
+                mascotasPanel.add(construirTarjetaMascota(m));
+                mascotasPanel.add(Box.createVerticalStrut(6));
+            }
         }
+        mascotasPanel.revalidate();
+        mascotasPanel.repaint();
     }
-    mascotasPanel.revalidate();
-    mascotasPanel.repaint();
-}
 
     private JPanel construirTarjetaMascota(Mascota m) {
-    JPanel tarjeta = new JPanel(new BorderLayout(10, 0));
-    tarjeta.setBackground(C_HUD_BG);
-    tarjeta.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(C_BORDE, 1),
-            BorderFactory.createEmptyBorder(6, 10, 6, 10)));
-    tarjeta.setAlignmentX(Component.LEFT_ALIGNMENT);
-    tarjeta.setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
+        JPanel tarjeta = new JPanel(new BorderLayout(10, 0));
+        tarjeta.setBackground(C_HUD_BG);
+        tarjeta.setBorder(BorderFactory.createCompoundBorder(
+                new LineBorder(C_BORDE, 1),
+                BorderFactory.createEmptyBorder(6, 10, 6, 10)));
+        tarjeta.setAlignmentX(Component.LEFT_ALIGNMENT);
+        tarjeta.setMaximumSize(new Dimension(Integer.MAX_VALUE, 90));
 
-    JLabel imagen = new JLabel(cargarIcono(m.getEspecie()));
-    imagen.setPreferredSize(new Dimension(64, 64));
-    imagen.setHorizontalAlignment(SwingConstants.CENTER);
-    tarjeta.add(imagen, BorderLayout.WEST);
+        JLabel imagen = new JLabel(cargarIcono(m.getEspecie()));
+        imagen.setPreferredSize(new Dimension(64, 64));
+        imagen.setHorizontalAlignment(SwingConstants.CENTER);
+        tarjeta.add(imagen, BorderLayout.WEST);
 
-    boolean sano = m.getEstado().describir().equals("Sano");
-    String estadoTag = sano ? "✓ SANO" : "✗ ENFERMO";
-    JTextArea detalle = new JTextArea(
-            String.format("%-5s  [%s]  Precio: $%-8.1f\n", m.getEspecie(), estadoTag, m.getPrecio())
-          + String.format("Salud: %3d%%   %s\n", m.getNivelSalud(), barra(m.getNivelSalud()))
-          + String.format("Hambre: %3d%%  Higiene: %3d%%", m.getNivelHambre(), m.getNivelHigiene()));
-    detalle.setEditable(false);
-    detalle.setFocusable(false);
-    detalle.setFont(F_HUD);
-    detalle.setBackground(C_HUD_BG);
-    detalle.setForeground(C_HUD_TEXTO);
-    tarjeta.add(detalle, BorderLayout.CENTER);
-    return tarjeta;
-}
-
-private ImageIcon cargarIcono(String especie) {
-    if (cacheIconos.containsKey(especie)) return cacheIconos.get(especie);
-    ImageIcon icono;
-    File archivo = new File("imagenes/" + especie.toLowerCase() + ".png");
-    if (archivo.exists()) {
-        Image escalada = new ImageIcon(archivo.getPath())
-                .getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
-        icono = new ImageIcon(escalada);
-    } else {
-        icono = iconoReemplazo();
+        boolean sano = m.getEstado().describir().equals("Sano");
+        String estadoTag = sano ? "✓ SANO" : "✗ ENFERMO";
+        JTextArea detalle = new JTextArea(
+                String.format("%-5s  [%s]  Precio: $%-8.1f\n", m.getEspecie(), estadoTag, m.getPrecio())
+                        + String.format("Salud: %3d%%   %s\n", m.getNivelSalud(), barra(m.getNivelSalud()))
+                        + String.format("Hambre: %3d%%  Higiene: %3d%%", m.getNivelHambre(), m.getNivelHigiene()));
+        detalle.setEditable(false);
+        detalle.setFocusable(false);
+        detalle.setFont(F_HUD);
+        detalle.setBackground(C_HUD_BG);
+        detalle.setForeground(C_HUD_TEXTO);
+        tarjeta.add(detalle, BorderLayout.CENTER);
+        return tarjeta;
     }
-    cacheIconos.put(especie, icono);
-    return icono;
-}
 
-private ImageIcon iconoReemplazo() {
-    BufferedImage img = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
-    Graphics2D g = img.createGraphics();
-    g.setColor(C_BORDE);
-    g.fillRoundRect(0, 0, 64, 64, 12, 12);
-    g.setColor(Color.WHITE);
-    g.setFont(F_TITULO);
-    g.drawString("?", 26, 40);
-    g.dispose();
-    return new ImageIcon(img);
-}
+    private ImageIcon cargarIcono(String especie) {
+        if (cacheIconos.containsKey(especie))
+            return cacheIconos.get(especie);
+        ImageIcon icono;
+        File archivo = new File("imagenes/" + especie.toLowerCase() + ".png");
+        if (archivo.exists()) {
+            Image escalada = new ImageIcon(archivo.getPath())
+                    .getImage().getScaledInstance(64, 64, Image.SCALE_SMOOTH);
+            icono = new ImageIcon(escalada);
+        } else {
+            icono = iconoReemplazo();
+        }
+        cacheIconos.put(especie, icono);
+        return icono;
+    }
 
-
-
+    private ImageIcon iconoReemplazo() {
+        BufferedImage img = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = img.createGraphics();
+        g.setColor(C_BORDE);
+        g.fillRoundRect(0, 0, 64, 64, 12, 12);
+        g.setColor(Color.WHITE);
+        g.setFont(F_TITULO);
+        g.drawString("?", 26, 40);
+        g.dispose();
+        return new ImageIcon(img);
+    }
 
     // barra progreso ASCII 10 caracteres para el HUD
     private String barra(int valor) {
@@ -398,7 +430,7 @@ private ImageIcon iconoReemplazo() {
         String tipo = sel.toString().split("\\s")[0];
         try {
             tienda.comprarMascota(tipo);
-            reproducirSonido("compra.wav");
+            ControlAudio.reproducirSFX("sonidos/compra.wav");
             log("✓ Mascota comprada: " + tipo + " (-$" + precioBase(tipo) + ")");
         } catch (DineroInsuficienteException | CapacidadMaximaException ex) {
             mostrarError(ex.getMessage());
@@ -451,7 +483,7 @@ private ImageIcon iconoReemplazo() {
         String tipo = sel.toString().split("\\s")[0];
         try {
             tienda.venderMascota(tipo);
-            reproducirSonido("venta.wav");
+            ControlAudio.reproducirSFX("sonidos/venta.wav");
             log("💰 Mascota vendida: " + tipo + " (+$" + (precioBase(tipo) * 1.5) + ")");
         } catch (MascotaEnfermaException ex) {
             JOptionPane.showMessageDialog(this, ex.getMessage(), "Venta bloqueada — Mascota enferma",
@@ -603,39 +635,4 @@ private ImageIcon iconoReemplazo() {
             return new Medicina("Tratamiento Intensivo", 90.0, 75);
         return null;
     }
-
-    private void reproducirSonido(String nombreArchivo) {
-    try {
-        AudioInputStream audio =
-                AudioSystem.getAudioInputStream(
-                        new File("sonidos/" + nombreArchivo));
-
-        Clip clip = AudioSystem.getClip();
-
-        clip.open(audio);
-
-        clip.start();
-
-    } catch (Exception e) {
-
-        e.printStackTrace();
-    }
-    }
-
-    private void reproducirMusicaFondo() {
-    try {
-        AudioInputStream audio =
-                AudioSystem.getAudioInputStream(
-                        new File("sonidos/fondo.wav"));
-
-        musicaFondo = AudioSystem.getClip();
-        musicaFondo.open(audio);
-        musicaFondo.loop(Clip.LOOP_CONTINUOUSLY);
-        musicaFondo.start();
-
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
 }
-}
-

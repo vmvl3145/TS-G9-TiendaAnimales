@@ -439,7 +439,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     }
 
     private void accionRescatar() {
-        Object[] opciones = { "Perro", "Gato", "Pez", "Cthulhu" };
+        Object[] opciones = { "Perro", "Gato", "Pez" };
         Object sel = JOptionPane.showInputDialog(
                 this,
                 "<html><b>Modelo de Rescate / Refugio</b><br>"

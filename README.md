@@ -24,7 +24,7 @@ Aquí puedes revisar la evolución de la arquitectura en cada iteración del pro
 *(Si su navegador no permite ver la visualización del PDF, [haz clic aquí para abrir el UML](documentos/UML_final.pdf))*
 
 ## Interfaz Gráfica (Screenshots)
-A continuación se presentan las vistas principales del simulador en funcionamiento, destacando la evolución visual y la experiencia de usuario (UX):
+A continuación se presentan las vistas principales del simulador en funcionamiento:
 
 ### 1. Dashboard Principal (Horario Comercial)
 ![Dashboard Principal](documentos/readme/captura_dashboard.png)

@@ -6,7 +6,7 @@ Simulador interactivo de gestión de una tienda de mascotas desarrollado por el 
 |Nombre|Matrícula|
 |------|---|
 |Joaquín Adauy|2025405466|
-|Joaquín Navarrete|202542012|
+|Joaquín Navarrete|2025420121|
 |Vicente Vergara|2025431734|
 
 ---
@@ -55,3 +55,11 @@ Podemos destacar las siguientes características del simulador:
 * **Adquisición Diferenciada:** Dos estrategias de juego distintas. *Comprar* es rápido pero costoso, mientras que *Rescatar* es gratuito pero introduce un animal enfermo que requiere inversión de recursos y tiempo.
 * **Manejo Robusto de Reglas de Negocio:** El juego previene errores del jugador mediante excepciones visuales (alertas en caso de fondos insuficientes, intentar superar el límite de 5 mascotas, o interactuar con un inventario vacío).
 * **Variedad de Mascotas:** El jugador puede gestionar distintos tipos de animales, incluyendo perros, gatos, peces, e incluso un *Cthulhu* como mascota especial (easter egg).
+
+---
+
+## Documentación Final
+
+Para conocer todos los detalles técnicos de la última iteración, las decisiones de diseño arquitectónico y la autocrítica del equipo, puede consultar nuestro informe completo:
+
+* 📄 **[Informe Técnico y Autocrítica Final (PDF)](documentos/InformeFinalTS-G9.pdf)**

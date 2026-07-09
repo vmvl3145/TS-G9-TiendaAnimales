@@ -7,6 +7,7 @@ import mascotas.Mascota;
 import suministros.Suministro;
 import suministros.Comida;
 import suministros.Medicina;
+import suministros.Higiene;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.HashMap;
@@ -496,12 +497,14 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
 
     private void accionComprarSuministro() {
         Object[] opciones = {
-                "Comida — Croquetas Basicas  ($15 | hambre -30)",
-                "Comida — Croquetas Premium  ($25 | hambre -50)",
-                "Comida — Comida Humeda      ($35 | hambre -70)",
-                "Medicina — Vitaminas           ($30 | salud +25)",
-                "Medicina — Antibiotico         ($60 | salud +50)",
-                "Medicina — Tratamiento Intensivo ($90 | salud +75)"
+                "Comida — Croquetas Basicas       ($15 | hambre -30)",
+                "Comida — Croquetas Premium       ($25 | hambre -50)",
+                "Comida — Extra Proteina          ($35 | hambre -70)",
+                "Medicina — Vitaminas             ($30 | salud +25)",
+                "Medicina — Antibiotico           ($60 | salud +50)",
+                "Medicina — Tratamiento Intensivo ($90 | salud +75)",
+                "Higiene — Cepillo y Shampoo      ($20 | higiene +40)",
+                "Higiene — Spa Completo           ($50 | higiene +100)"
         };
         Object sel = JOptionPane.showInputDialog(
                 this, "Selecciona el suministro a comprar:",
@@ -625,14 +628,18 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
             return new Comida("Croquetas Basicas", 15.0, 30);
         if (opcion.contains("Croquetas Premium"))
             return new Comida("Croquetas Premium", 25.0, 50);
-        if (opcion.contains("Comida Humeda"))
-            return new Comida("Comida Humeda", 35.0, 70);
+        if (opcion.contains("Extra Proteina"))
+            return new Comida("Extra Proteina", 35.0, 70);
         if (opcion.contains("Vitaminas"))
             return new Medicina("Vitaminas", 30.0, 25);
         if (opcion.contains("Antibiotico"))
             return new Medicina("Antibiotico", 60.0, 50);
         if (opcion.contains("Tratamiento Intensivo"))
             return new Medicina("Tratamiento Intensivo", 90.0, 75);
+        if (opcion.contains("Cepillo y Shampoo"))
+            return new Higiene("Cepillo y Shampoo", 20.0, 40);
+        if (opcion.contains("Spa Completo"))
+            return new Higiene("Spa Completo", 50.0, 100);
         return null;
     }
 }

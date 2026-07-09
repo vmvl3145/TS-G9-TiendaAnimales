@@ -111,8 +111,8 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         raiz.add(construirCentro(), BorderLayout.CENTER);
         raiz.add(construirPanelLog(), BorderLayout.SOUTH);
 
-        // Timer Automático: 10 segundos
-        timerTiempo = new Timer(10000, e -> {
+        // Timer Automático: 20 segundos
+        timerTiempo = new Timer(20000, e -> {
             if (Tienda.getTienda().isTiendaAbierta()) {
                 Tienda.getTienda().avanzarReloj();
             }

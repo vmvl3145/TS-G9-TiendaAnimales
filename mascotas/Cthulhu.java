@@ -6,6 +6,6 @@ public class Cthulhu extends Mascota{
     }
     @Override
     public void makeSound(){
-        System.out.println("No hay palabras humanas para esto. Tu mente traduce el sonido comoel crujir de estrellas muertas y el peso de un mar difunto.");
+        System.out.println("No hay palabras humanas para esto. Tu mente traduce el sonido como el crujir de estrellas muertas y el peso de un mar difunto...");
     }
 }

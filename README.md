@@ -24,7 +24,23 @@ Aquí puedes revisar la evolución de la arquitectura en cada iteración del pro
 *(Si su navegador no permite ver la visualización del PDF, [haz clic aquí para abrir el UML](documentos/UML_final.pdf))*
 
 ## Interfaz Gráfica (Screenshots)
-*(Espacio reservado)*
+A continuación se presentan las vistas principales del simulador en funcionamiento, destacando la evolución visual y la experiencia de usuario (UX):
+
+### 1. Dashboard Principal (Horario Comercial)
+![Dashboard Principal](documentos/readme/captura_dashboard.png)
+> *Vista general de la tienda en funcionamiento. A la izquierda se observa el HUD dinámico con el reloj, el presupuesto y el contador de inventario. En el centro, las tarjetas visuales de las mascotas y, en la parte inferior, la consola inmutable de registro de eventos (logs).*
+
+### 2. Gestión de Crisis (Rescate de Animales)
+![Rescate y Estado Crítico](documentos/readme/captura_estado_critico.png)
+> *Demostración del patrón State en acción. Una mascota recién rescatada aparece marcada en rojo indicando `[X ENFERMO]` y con sus barras de estadística al mínimo, requiriendo atención urgente (uso de suministros) antes de poder integrarse a la economía de la tienda.*
+
+### 3. Cierre de Jornada y Validaciones de Negocio
+![Tienda Cerrada y Excepciones](documentos/readme/captura_excepciones.png)
+> *El simulador cuenta con validaciones estrictas. Esta captura muestra cómo reacciona el sistema a las 20:00 hrs: los botones contextuales cambian a "Empezar Siguiente Día" y se disparan ventanas emergentes (alertas visuales de Excepciones) si se intenta comprar sin dinero o fuera del horario.*
+
+### 4. Sistema de Audio y Opciones
+![Menú de Opciones y Volumen](documentos/readme/captura_audio.png)
+> *Menú lateral derecho que demuestra el sistema `ControlAudio` implementado en hilos independientes, permitiendo ajustar el volumen de la música de fondo y los efectos (SFX) en tiempo real sin congelar el reloj del juego.*
 
 ## Gameplay
 

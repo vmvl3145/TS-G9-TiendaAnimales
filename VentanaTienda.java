@@ -455,7 +455,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         detalle.setFocusable(false);
         detalle.setFont(F_HUD);
         detalle.setBackground(C_HUD_BG);
-        detalle.setForeground(C_HUD_TEXTO);
+        detalle.setForeground(sano ? C_HUD_TEXTO : new Color(255, 80, 80));
         tarjeta.add(detalle, BorderLayout.CENTER);
         return tarjeta;
     }

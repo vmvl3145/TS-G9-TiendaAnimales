@@ -14,6 +14,13 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.swing.event.ChangeEvent;
 
+/**
+ * Ventana principal de la aplicación que representa la Interfaz Gráfica de Usuario (GUI).
+ * Construida con la biblioteca Swing, actúa como la "Vista" en la arquitectura del sistema.
+ * <p>
+ * Implementa {@link ObservadorTienda} para reaccionar y actualizarse automáticamente
+ * frente a los cambios de estado del modelo ({@link Tienda}) mediante el patrón Observer.
+ */
 public class VentanaTienda extends JFrame implements ObservadorTienda {
 
     private static final Color C_FONDO = new Color(15, 17, 26);
@@ -52,6 +59,13 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     private JButton btnTiempo;
     private Timer timerTiempo;
 
+    /**
+     * Constructor de la ventana principal.
+     * Inicializa la interfaz gráfica, solicita el nombre del jugador si es una partida nueva,
+     * inscribe la ventana como observadora del modelo e inicia la música de fondo.
+     *
+     * @param archivoGuardado La ruta del archivo donde se guardará o desde donde se cargará la partida.
+     */
     // CONSTRUCTOR
     public VentanaTienda(String archivoGuardado) {
         this.tienda = Tienda.getTienda();
@@ -77,6 +91,11 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         ControlAudio.reproducirFondo("sonidos/fondo.wav");
     }
 
+    /**
+     * Construye y ensambla todos los paneles, botones y áreas de texto de la interfaz.
+     * También configura el comportamiento de cierre de la ventana y el temporizador
+     * automático para el paso del tiempo.
+     */
     // CONSTRUCCIЩN DE LA UI
     private void construirUI() {
         setTitle("Tienda de Mascotas - " + tienda.getNombreJugador());
@@ -349,13 +368,20 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         return btn;
     }
 
-    // PATRÓN OBSERVER — Implementación del contrato ObservadorTienda
+    /**
+     * Patrón Observer: Método llamado automáticamente por el modelo ({@link Tienda})
+     * cada vez que ocurre un cambio en su estado interno.
+     */
     @Override
     public void actualizar() {
         actualizarHUD();
     }
 
-    // HUD — Renderizado del estado
+    /**
+     * Refresca toda la información visual de la interfaz gráfica.
+     * Lee los datos actuales de la tienda (presupuesto, inventario, reloj)
+     * y redibuja los paneles correspondientes.
+     */
     public void actualizarHUD() {
         StringBuilder sb = new StringBuilder();
         sb.append("SIMULADOR DE TIENDA DE MASCOTAS\n");
@@ -399,6 +425,12 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
     }
 
+    /**
+     * Construye un panel visual (tarjeta) para representar individualmente a una mascota.
+     *
+     * @param m La mascota cuyos datos se van a renderizar.
+     * @return Un JPanel con el icono, estadísticas y barras de progreso de la mascota.
+     */
     private JPanel construirTarjetaMascota(Mascota m) {
         JPanel tarjeta = new JPanel(new BorderLayout(10, 0));
         tarjeta.setBackground(C_HUD_BG);
@@ -428,6 +460,13 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         return tarjeta;
     }
 
+    /**
+     * Carga y escala la imagen representativa de una especie de mascota.
+     * Utiliza una caché en memoria para evitar leer el disco múltiples veces.
+     *
+     * @param especie El nombre de la especie a cargar (ej. "Perro").
+     * @return El ImageIcon escalado listo para ser usado en la interfaz.
+     */
     private ImageIcon cargarIcono(String especie) {
         if (cacheIconos.containsKey(especie))
             return cacheIconos.get(especie);
@@ -462,6 +501,12 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         return "[" + "█".repeat(llenos) + "░".repeat(10 - llenos) + "]";
     }
 
+    /**
+     * Añade un mensaje descriptivo al panel de registro de eventos (Log)
+     * en la parte inferior de la interfaz.
+     *
+     * @param mensaje El texto a mostrar.
+     */
     private void log(String mensaje) {
         logArea.append("> " + mensaje + "\n");
         // Auto-scroll al final del log
@@ -469,6 +514,8 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     }
 
     // ACCIONES BOTONES
+
+    /** Despliega el menú para adquirir una mascota pagando su valor base. */
     private void accionComprar() {
         Object[] opciones = { "Perro  ($150)", "Gato   ($100)", "Pez    ($50)", "Cthulhu    ($9999)" };
         Object sel = JOptionPane.showInputDialog(
@@ -491,6 +538,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
     }
 
+    /** Despliega el menú para rescatar una mascota gratuita en estado crítico. */
     private void accionRescatar() {
         Object[] opciones = { "Perro", "Gato", "Pez" };
         Object sel = JOptionPane.showInputDialog(
@@ -512,6 +560,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
     }
 
+    /** Despliega el menú para vender una mascota sana a cambio de dinero. */
     private void accionVender() {
         if (tienda.getInventarioMascotas().isEmpty()) {
             JOptionPane.showMessageDialog(this, "No hay mascotas en el inventario.", "Inventario vacío",
@@ -546,7 +595,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
             mostrarError(ex.getMessage());
         }
     }
-
+    /** Despliega el menú para adquirir suministros como comida o medicinas. */
     private void accionComprarSuministro() {
         Object[] opciones = {
                 "Comida — Croquetas Basicas       ($15 | hambre -30)",
@@ -577,6 +626,10 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
     }
 
+    /**
+     * Coordina la acción de aplicar un suministro disponible sobre una mascota en inventario.
+     * Funciona en dos pasos mediante ventanas de diálogo consecutivas.
+     */
     private void accionUsarSuministro() {
         if (!tienda.isTiendaAbierta()) {
             mostrarError("La tienda está cerrada. Pasa al siguiente día para continuar.");
@@ -632,6 +685,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
     }
 
+    /** Adelanta el tiempo hasta la hora de cierre o inicia un nuevo día. */
     private void accionPasarTiempo() {
         if (tienda.isTiendaAbierta()) {
             int horasRestantes = 20 - tienda.getHoraActual();
@@ -644,6 +698,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
     }
 
+    /** Solicita al modelo guardar el estado actual de la partida en el disco. */
     private void accionGuardar() {
         tienda.guardarPartida(archivoGuardado);
         log(">> Partida guardada en: " + archivoGuardado);
@@ -652,6 +707,10 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
                 "Partida Guardada", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Carga una partida previamente guardada desde el disco y resincroniza
+     * esta ventana con la nueva instancia de la tienda.
+     */
     private void accionCargar() {
         int conf = JOptionPane.showConfirmDialog(
                 this,
@@ -668,10 +727,22 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     }
 
     // HELPERS PRIVADOS
+
+    /**
+     * Muestra una ventana emergente de alerta estándar.
+     *
+     * @param mensaje El detalle del error a mostrar al usuario.
+     */
     private void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }
 
+    /**
+     * Determina el precio base de las especies para mostrarlos en los cálculos de la interfaz.
+     *
+     * @param tipo El nombre de la especie.
+     * @return El valor numérico base.
+     */
     private double precioBase(String tipo) {
         switch (tipo.toLowerCase()) {
             case "perro":
@@ -685,6 +756,12 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
     }
 
+    /**
+     * Fábrica de suministros interna para la interfaz gráfica basada en la selección del menú.
+     *
+     * @param opcion El string completo seleccionado por el usuario en el JOptionPane.
+     * @return Una instancia concreta de Suministro (Comida, Medicina, Higiene).
+     */
     // Instancia el Suministro correspondiente según el texto del JOptionPane
     private Suministro crearSuministro(String opcion) {
         if (opcion.contains("Croquetas Basicas"))

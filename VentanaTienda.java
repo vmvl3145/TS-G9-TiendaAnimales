@@ -49,6 +49,8 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     private JTextArea logArea;
     private JPanel mascotasPanel;
     private final Map<String, ImageIcon> cacheIconos = new HashMap<>();
+    private JButton btnTiempo;
+    private Timer timerTiempo;
 
     // CONSTRUCTOR
     public VentanaTienda(String archivoGuardado) {
@@ -108,6 +110,14 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         raiz.add(construirHeader(), BorderLayout.NORTH);
         raiz.add(construirCentro(), BorderLayout.CENTER);
         raiz.add(construirPanelLog(), BorderLayout.SOUTH);
+
+        // Timer Automático: 10 segundos
+        timerTiempo = new Timer(10000, e -> {
+            if (Tienda.getTienda().isTiendaAbierta()) {
+                Tienda.getTienda().avanzarReloj();
+            }
+        });
+        timerTiempo.start();
 
         add(raiz);
     }
@@ -247,8 +257,9 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
                 boton("Usar Suministro", C_BTN_SUMINISTRO, e -> accionUsarSuministro())
         }));
         p.add(Box.createVerticalStrut(8));
+        btnTiempo = boton("Terminar Día", C_BTN_TIEMPO, e -> accionPasarTiempo());
         p.add(seccion("TIEMPO", new JButton[] {
-                boton("Pasar el Tiempo", C_BTN_TIEMPO, e -> accionPasarTiempo())
+                btnTiempo
         }));
         p.add(Box.createVerticalStrut(8));
         p.add(seccion("SISTEMA", new JButton[] {
@@ -348,6 +359,9 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     public void actualizarHUD() {
         StringBuilder sb = new StringBuilder();
         sb.append("SIMULADOR DE TIENDA DE MASCOTAS\n");
+        String estadoStr = tienda.isTiendaAbierta() ? "ABIERTA" : "CERRADA";
+        sb.append(String.format("DÍA: %d  |  RELOJ: %02d:00  |  ESTADO: %s\n\n",
+                tienda.getDiaActual(), tienda.getHoraActual(), estadoStr));
         sb.append(String.format("Presupuesto disponible : $%-17.2f\n", tienda.getPresupuesto()));
         sb.append(String.format("Inventario mascotas    : %d / 5\n", tienda.getInventarioMascotas().size()));
         sb.append(String.format("Suministros en stock   : %-18d\n", tienda.getInventarioSuministros().size()));
@@ -375,6 +389,14 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         }
         mascotasPanel.revalidate();
         mascotasPanel.repaint();
+
+        if (btnTiempo != null) {
+            if (tienda.isTiendaAbierta()) {
+                btnTiempo.setText("Terminar Día");
+            } else {
+                btnTiempo.setText("Empezar Siguiente Día");
+            }
+        }
     }
 
     private JPanel construirTarjetaMascota(Mascota m) {
@@ -463,7 +485,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
             tienda.comprarMascota(tipo);
             ControlAudio.reproducirSFX("sonidos/compra.wav");
             log("✓ Mascota comprada: " + tipo + " (-$" + precioBase(tipo) + ")");
-        } catch (DineroInsuficienteException | CapacidadMaximaException ex) {
+        } catch (DineroInsuficienteException | CapacidadMaximaException | TiendaCerradaException ex) {
             mostrarError(ex.getMessage());
             log("✗ Error al comprar " + tipo + ": " + ex.getMessage());
         }
@@ -484,7 +506,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         try {
             tienda.rescatarMascota(sel.toString());
             log("♥ Mascota rescatada: " + sel + " (¡necesita cuidados urgentes!)");
-        } catch (CapacidadMaximaException ex) {
+        } catch (CapacidadMaximaException | TiendaCerradaException ex) {
             mostrarError(ex.getMessage());
             log("✗ " + ex.getMessage());
         }
@@ -516,8 +538,8 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
             tienda.venderMascota(tipo);
             ControlAudio.reproducirSFX("sonidos/venta.wav");
             log("💰 Mascota vendida: " + tipo + " (+$" + (precioBase(tipo) * 1.5) + ")");
-        } catch (MascotaEnfermaException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Venta bloqueada — Mascota enferma",
+        } catch (MascotaEnfermaException | TiendaCerradaException ex) {
+            JOptionPane.showMessageDialog(this, ex.getMessage(), "Venta bloqueada",
                     JOptionPane.WARNING_MESSAGE);
             log("✗ Venta bloqueada: " + ex.getMessage());
         } catch (MascotaNoEncontradaException ex) {
@@ -549,13 +571,17 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         try {
             tienda.agregarSuministro(s);
             log("🛒 Suministro comprado: " + s.getNombre() + " (-$" + s.getPrecio() + ")");
-        } catch (DineroInsuficienteException ex) {
+        } catch (DineroInsuficienteException | TiendaCerradaException ex) {
             mostrarError(ex.getMessage());
-            log("✗ Sin fondos: " + ex.getMessage());
+            log("✗ Error: " + ex.getMessage());
         }
     }
 
     private void accionUsarSuministro() {
+        if (!tienda.isTiendaAbierta()) {
+            mostrarError("La tienda está cerrada. Pasa al siguiente día para continuar.");
+            return;
+        }
         if (tienda.getInventarioSuministros().isEmpty()) {
             JOptionPane.showMessageDialog(this, "No hay suministros en stock. Compra primero.", "Sin stock",
                     JOptionPane.WARNING_MESSAGE);
@@ -607,8 +633,15 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     }
 
     private void accionPasarTiempo() {
-        tienda.pasarTiempo();
-        log(">> Tiempo avanzado — los animales sienten necesidades. ¡Revisa su estado!");
+        if (tienda.isTiendaAbierta()) {
+            int horasRestantes = 20 - tienda.getHoraActual();
+            for (int i = 0; i < horasRestantes; i++) {
+                tienda.avanzarReloj();
+            }
+            log(">> Terminaste el día anticipadamente.");
+        } else {
+            tienda.empezarSiguienteDia();
+        }
     }
 
     private void accionGuardar() {

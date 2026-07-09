@@ -17,6 +17,12 @@ public class Tienda implements Serializable {
     private String nombreJugador;
     private transient boolean cambiosSinGuardar = false;
 
+    // VARIABLES DE TIEMPO
+    private int horaActual = 8;
+    private int horaCierre = 20;
+    private int diaActual = 1;
+    private boolean tiendaAbierta = true;
+
     // Constructor privado para el patrón Singleton
     private Tienda() {
         this.presupuesto = 1000.0;
@@ -63,6 +69,37 @@ public class Tienda implements Serializable {
         this.cambiosSinGuardar = cambiosSinGuardar;
     }
 
+    public int getHoraActual() {
+        if (horaCierre == 0)
+            initDefaults(); // Para partidas viejas guardadas
+        return horaActual;
+    }
+
+    public int getDiaActual() {
+        if (horaCierre == 0)
+            initDefaults();
+        return diaActual;
+    }
+
+    public boolean isTiendaAbierta() {
+        if (horaCierre == 0)
+            initDefaults();
+        return tiendaAbierta;
+    }
+
+    private void initDefaults() {
+        this.horaActual = 8;
+        this.horaCierre = 20;
+        this.diaActual = 1;
+        this.tiendaAbierta = true;
+    }
+
+    public void verificarAbierta() throws TiendaCerradaException {
+        if (!isTiendaAbierta()) {
+            throw new TiendaCerradaException("La tienda está cerrada. Pasa al siguiente día para continuar.");
+        }
+    }
+
     public void agregarObservador(ObservadorTienda obs) {
         if (observadores == null)
             observadores = new ArrayList<>();
@@ -85,7 +122,8 @@ public class Tienda implements Serializable {
     }
 
     public void comprarMascota(String tipo)
-            throws DineroInsuficienteException, CapacidadMaximaException {
+            throws DineroInsuficienteException, CapacidadMaximaException, TiendaCerradaException {
+        verificarAbierta();
         if (inventarioMascotas.size() >= inventarioMaximo) {
             throw new CapacidadMaximaException(
                     "No hay espacio en la tienda. Vende una mascota primero.");
@@ -96,7 +134,8 @@ public class Tienda implements Serializable {
         notificarObservadores(); // Observer: notifica cambio de estado
     }
 
-    public void rescatarMascota(String tipo) throws CapacidadMaximaException {
+    public void rescatarMascota(String tipo) throws CapacidadMaximaException, TiendaCerradaException {
+        verificarAbierta();
         if (inventarioMascotas.size() >= inventarioMaximo) {
             throw new CapacidadMaximaException(
                     "No hay espacio en la tienda. Vende una mascota primero.");
@@ -106,14 +145,17 @@ public class Tienda implements Serializable {
         notificarObservadores(); // Observer: notifica cambio de estado
     }
 
-    public void agregarMascota(Mascota mascota) throws CapacidadMaximaException {
+    public void agregarMascota(Mascota mascota) throws CapacidadMaximaException, TiendaCerradaException {
+        verificarAbierta();
         if (inventarioMascotas.size() >= inventarioMaximo) {
             throw new CapacidadMaximaException("No hay espacio en la tienda para un/a " + mascota.getEspecie());
         }
         inventarioMascotas.add(mascota);
     }
 
-    public void venderMascota(String especieMascota) throws MascotaNoEncontradaException, MascotaEnfermaException {
+    public void venderMascota(String especieMascota)
+            throws MascotaNoEncontradaException, MascotaEnfermaException, TiendaCerradaException {
+        verificarAbierta();
         Mascota mascotaVender = null;
         for (Mascota m : inventarioMascotas) {
             if (m.getEspecie().equalsIgnoreCase(especieMascota)) {
@@ -135,7 +177,8 @@ public class Tienda implements Serializable {
         notificarObservadores(); // Observer notifica cambio de estado
     }
 
-    public void agregarSuministro(Suministro suministro) throws DineroInsuficienteException {
+    public void agregarSuministro(Suministro suministro) throws DineroInsuficienteException, TiendaCerradaException {
+        verificarAbierta();
         if (this.presupuesto >= suministro.getPrecio()) {
             this.presupuesto -= suministro.getPrecio();
             inventarioSuministros.add(suministro);
@@ -149,8 +192,27 @@ public class Tienda implements Serializable {
     }
 
     // TIEMPO
+    public void avanzarReloj() {
+        if (!isTiendaAbierta())
+            return;
+        horaActual++;
+        if (horaActual >= horaCierre) {
+            tiendaAbierta = false;
+            System.out.println("\n[Las 20:00! La tienda ha cerrado. Finaliza el día]");
+        }
+        pasarTiempo(); // Aplica los efectos a las mascotas
+    }
+
+    public void empezarSiguienteDia() {
+        this.diaActual++;
+        this.horaActual = 8;
+        this.tiendaAbierta = true;
+        System.out.println("\n[¡Nuevo Día! Día " + this.diaActual + " iniciado]");
+        notificarObservadores();
+    }
+
     public void pasarTiempo() {
-        System.out.println("\n[Pasando el tiempo en la tienda... Los animales sienten necesidades]");
+        System.out.println("\n[Ha pasado una hora in-game... Las mascotas sienten necesidades]");
         for (Mascota m : inventarioMascotas) {
             m.setNivelHambre(m.getNivelHambre() + 15);
             m.setNivelHigiene(m.getNivelHigiene() - 10);

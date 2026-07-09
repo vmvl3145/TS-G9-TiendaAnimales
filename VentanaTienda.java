@@ -54,6 +54,19 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
     public VentanaTienda(String archivoGuardado) {
         this.tienda = Tienda.getTienda();
         this.archivoGuardado = archivoGuardado;
+
+        String nombre = this.tienda.getNombreJugador();
+        if (nombre == null || nombre.trim().isEmpty()) {
+            nombre = JOptionPane.showInputDialog(null,
+                    "¡Bienvenido a la Tienda de Mascotas!\nIngresa tu nombre para comenzar:",
+                    "Nueva Partida", JOptionPane.QUESTION_MESSAGE);
+            if (nombre == null || nombre.trim().isEmpty()) {
+                nombre = "Jefe/a de la tienda";
+            }
+            this.tienda.setNombreJugador(nombre.trim());
+            this.tienda.setCambiosSinGuardar(true);
+        }
+
         construirUI();
         // Observer
         this.tienda.agregarObservador(this);
@@ -64,10 +77,27 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
 
     // CONSTRUCCIЩN DE LA UI
     private void construirUI() {
-        setTitle("Tienda de Mascotas");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 680);
-        setMinimumSize(new Dimension(800, 580));
+        setTitle("Tienda de Mascotas - " + tienda.getNombreJugador());
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                if (Tienda.getTienda().isCambiosSinGuardar()) {
+                    int confirm = JOptionPane.showConfirmDialog(VentanaTienda.this,
+                            "Tienes cambios sin guardar. ¿Deseas salir de todas formas?",
+                            "Confirmar Salida", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        System.exit(0);
+                    }
+                } else {
+                    System.exit(0);
+                }
+            }
+        });
+
+        setSize(1000, 780);
+        setMinimumSize(new Dimension(800, 780));
         setLocationRelativeTo(null);
         getContentPane().setBackground(C_FONDO);
 
@@ -94,7 +124,7 @@ public class VentanaTienda extends JFrame implements ObservadorTienda {
         titulo.setFont(F_TITULO);
         titulo.setForeground(Color.WHITE);
 
-        JLabel sub = new JLabel("testeando fuentes");
+        JLabel sub = new JLabel("Jefe/a: " + tienda.getNombreJugador());
         sub.setFont(new Font("SansSerif", Font.ITALIC, 12));
         sub.setForeground(C_SUBTITULO);
 

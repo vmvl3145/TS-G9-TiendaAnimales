@@ -14,6 +14,8 @@ public class Tienda implements Serializable {
     private List<Suministro> inventarioSuministros;
     private final int inventarioMaximo = 5;
     private transient List<ObservadorTienda> observadores;
+    private String nombreJugador;
+    private transient boolean cambiosSinGuardar = false;
 
     // Constructor privado para el patrón Singleton
     private Tienda() {
@@ -21,6 +23,7 @@ public class Tienda implements Serializable {
         this.inventarioMascotas = new ArrayList<>();
         this.inventarioSuministros = new ArrayList<>();
         this.observadores = new ArrayList<>();
+        this.nombreJugador = "";
     }
 
     // Método de acceso global (Singleton)
@@ -44,6 +47,22 @@ public class Tienda implements Serializable {
         return inventarioSuministros;
     }
 
+    public String getNombreJugador() {
+        return nombreJugador;
+    }
+
+    public void setNombreJugador(String nombreJugador) {
+        this.nombreJugador = nombreJugador;
+    }
+
+    public boolean isCambiosSinGuardar() {
+        return cambiosSinGuardar;
+    }
+
+    public void setCambiosSinGuardar(boolean cambiosSinGuardar) {
+        this.cambiosSinGuardar = cambiosSinGuardar;
+    }
+
     public void agregarObservador(ObservadorTienda obs) {
         if (observadores == null)
             observadores = new ArrayList<>();
@@ -57,6 +76,7 @@ public class Tienda implements Serializable {
     }
 
     private void notificarObservadores() {
+        this.cambiosSinGuardar = true;
         if (observadores == null)
             return;
         for (ObservadorTienda obs : observadores) {
@@ -169,6 +189,7 @@ public class Tienda implements Serializable {
     public void guardarPartida(String ruta) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(ruta))) {
             oos.writeObject(this);
+            this.cambiosSinGuardar = false;
             System.out.println(">> Partida guardada en " + ruta);
         } catch (IOException e) {
             System.err.println("Error al guardar la partida: " + e.getMessage());
